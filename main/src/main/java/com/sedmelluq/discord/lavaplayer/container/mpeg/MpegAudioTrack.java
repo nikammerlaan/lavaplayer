@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.FAULT;
 import static com.sedmelluq.discord.lavaplayer.tools.FriendlyException.Severity.SUSPICIOUS;
@@ -63,7 +64,10 @@ public class MpegAudioTrack extends BaseAudioTrack {
       trackConsumer = selectAudioTrack(file.getTrackList(), context);
 
       if (trackConsumer == null) {
-        throw new FriendlyException("The audio codec used in the track is not supported.", SUSPICIOUS, null);
+          String availableCodecs = file.getTrackList().stream()
+              .map(track -> track.codecName)
+              .collect(Collectors.joining(", "));
+        throw new FriendlyException("The audio codec used in the track is not supported. Availabe codecs: " + availableCodecs, SUSPICIOUS, null);
       } else {
         log.debug("Starting to play track with codec {}", trackConsumer.getTrack().codecName);
       }
